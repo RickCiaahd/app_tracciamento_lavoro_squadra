@@ -1,0 +1,13 @@
+{
+  "name": "app-tracciamento-lavoro-squadra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "test": "node --test",
+    "check": "node --check app.js && node --check analytics.js && node --check storage.js && node --check server.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
+
