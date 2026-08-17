@@ -63,8 +63,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final d = data;
-    if (d == null)
+    if (d == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final pages = [
       PlannerPage(
         data: d,
@@ -791,12 +792,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   FilledButton.icon(
                     onPressed: () async {
                       await widget.repo.copyBackup(widget.data);
-                      if (mounted)
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Backup copiato negli appunti'),
                           ),
                         );
+                      }
                     },
                     icon: const Icon(Icons.copy),
                     label: const Text('Copia backup'),
@@ -812,12 +814,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           widget.data.assignments = imported.assignments;
                           await widget.onChanged();
                         } catch (_) {
-                          if (mounted)
+                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Backup non valido'),
                               ),
                             );
+                          }
                         }
                       }
                     },

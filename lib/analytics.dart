@@ -9,8 +9,9 @@ DateTime startOfWeek(DateTime d) =>
     final start = startOfWeek(reference);
     return (start, start.add(const Duration(days: 6)));
   }
-  if (type == PeriodType.year)
+  if (type == PeriodType.year) {
     return (DateTime(reference.year), DateTime(reference.year, 12, 31));
+  }
   return (
     DateTime(reference.year, reference.month),
     DateTime(reference.year, reference.month + 1, 0),
@@ -47,9 +48,12 @@ List<OperatorReport> buildReport(
       if (parts.length != 2 ||
           parts[0] != operator.id ||
           parts[1].compareTo(min) < 0 ||
-          parts[1].compareTo(max) > 0)
+          parts[1].compareTo(max) > 0) {
         continue;
-      if (entry.value.isNotEmpty) activeDays++;
+      }
+      if (entry.value.isNotEmpty) {
+        activeDays++;
+      }
       for (final id in entry.value) {
         if (counts.containsKey(id)) counts[id] = counts[id]! + 1;
       }
