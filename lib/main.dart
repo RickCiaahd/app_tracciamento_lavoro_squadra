@@ -369,39 +369,67 @@ class ActivityDialog extends StatefulWidget {
 
 class _ActivityDialogState extends State<ActivityDialog> {
   late final Set<String> chosen = {...widget.initial};
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final dialogHeight = math.min(screenHeight * .62, 460.0);
+    final media = MediaQuery.of(context);
+    final availableHeight =
+        media.size.height - media.padding.top - media.padding.bottom;
+    final dialogHeight = math.min(availableHeight * .82, 560.0);
 
-    return AlertDialog(
+    return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      title: Text(widget.operator.name),
-      contentPadding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
-      content: SizedBox(
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
         width: double.maxFinite,
         height: dialogHeight,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${widget.date.day}/${widget.date.month}/${widget.date.year}',
-              style: const TextStyle(color: Colors.black54),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.operator.name,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${widget.date.day}/${widget.date.month}/${widget.date.year}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
             const Divider(height: 1),
-            const SizedBox(height: 4),
             Expanded(
               child: Scrollbar(
+                controller: _scrollController,
                 thumbVisibility: true,
                 child: ListView.builder(
-                  padding: const EdgeInsets.only(right: 4),
+                  controller: _scrollController,
+                  primary: false,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: widget.data.activities.length,
                   itemBuilder: (context, index) {
                     final a = widget.data.activities[index];
                     return CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                       controlAffinity: ListTileControlAffinity.trailing,
                       value: chosen.contains(a.id),
                       activeColor: teal,
@@ -420,22 +448,30 @@ class _ActivityDialogState extends State<ActivityDialog> {
                 ),
               ),
             ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Annulla'),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: () {
+                      widget.onSaved(chosen.toList());
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Salva attività'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Annulla'),
-        ),
-        FilledButton(
-          onPressed: () {
-            widget.onSaved(chosen.toList());
-            Navigator.pop(context);
-          },
-          child: const Text('Salva attività'),
-        ),
-      ],
     );
   }
 }
@@ -491,7 +527,7 @@ class _ReportPageState extends State<ReportPage> {
                       lastDate: DateTime(2100),
                       initialDate: reference,
                     );
-                    if (d != null) setState(() => reference = d);
+                    if (d != null) setState(() => reference = d!),
                   },
                   icon: const Icon(Icons.event),
                   label: Text(
