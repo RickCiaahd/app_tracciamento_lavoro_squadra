@@ -1,43 +1,45 @@
-# Tracciamento lavoro squadra
+# Squadra Tracker — Android
 
-PWA installabile per pianificare le attività giornaliere di una squadra senza digitare le mansioni a mano. Ogni casella del calendario apre una selezione a checkbox; la dashboard produce percentuali settimanali, mensili e annuali per operatore.
+App Flutter offline per assegnare più attività giornaliere agli operatori tramite checkbox e visualizzare report settimanali, mensili e annuali.
+
+## Scaricare l’APK
+
+Ogni aggiornamento avvia il workflow **Android APK**. Aprire la relativa esecuzione nella scheda **Actions**, scaricare l’artifact `squadra-tracker-apk`, estrarre lo ZIP e inviare `app-release.apk` al telefono.
+
+Sul telefono potrebbe essere necessario autorizzare temporaneamente l’installazione di app provenienti dal browser o dal gestore file. Gli aggiornamenti firmati in modo coerente possono essere installati sopra la versione precedente conservando i dati.
 
 ## Funzioni
 
-- calendario settimanale ottimizzato per telefono e desktop;
-- selezione multipla delle attività tramite checkbox;
-- operatori e attività modificabili;
-- dashboard con un grafico per ogni operatore;
-- dati salvati localmente, funzionamento offline e backup JSON;
-- installazione come app Android dalla schermata Home;
-- nessun database o account richiesto per il prototipo.
+- calendario settimanale con operatori sulle righe e giorni sulle colonne;
+- multiselezione delle attività con checkbox;
+- gestione modificabile di operatori e attività;
+- report settimanali, mensili e annuali con percentuali e grafico per operatore;
+- persistenza offline sul dispositivo tramite SharedPreferences;
+- backup JSON copiabile e importabile dagli appunti;
+- nessun server, login o connessione Internet richiesti dopo l’installazione.
 
-## Avvio locale
+## Sviluppo locale
 
-Richiede Node.js 20 o successivo.
-
-```bash
-npm run dev
-```
-
-Aprire `http://localhost:4173`. Per installarla su Android, pubblicarla su HTTPS, aprirla con Chrome e scegliere **Installa app** o **Aggiungi a schermata Home**.
-
-## Test
+Richiede Flutter stable e Android Studio/Android SDK.
 
 ```bash
-npm test
-npm run check
+flutter create --platforms=android --org it.rickciaahd --project-name squadra_tracker .
+flutter pub get
+flutter run
 ```
 
-## Dati e sincronizzazione
+Per creare manualmente l’APK:
 
-Questa prima versione usa `localStorage`: i dati restano nel browser del singolo dispositivo. Il backup si esporta e importa dalle Impostazioni. Per l’uso contemporaneo da più telefoni, la fase successiva prevede autenticazione e database condiviso (Supabase o Firebase).
+```bash
+flutter build apk --release
+```
 
-## Struttura
+Il file sarà in `build/app/outputs/flutter-apk/app-release.apk`.
 
-- `app.js`: interfaccia e flussi utente;
-- `analytics.js`: periodi, conteggi e percentuali;
-- `storage.js`: persistenza e validazione backup;
-- `sw.js` e `manifest.webmanifest`: installazione e uso offline;
-- `test/`: test automatici senza dipendenze esterne.
+## Verifiche
+
+```bash
+flutter analyze
+flutter test
+```
 
