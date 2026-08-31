@@ -369,57 +369,75 @@ class ActivityDialog extends StatefulWidget {
 
 class _ActivityDialogState extends State<ActivityDialog> {
   late final Set<String> chosen = {...widget.initial};
+
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.operator.name),
-    content: SizedBox(
-      width: double.maxFinite,
-      height: math.min(
-        MediaQuery.sizeOf(context).height * .58,
-        72.0 + widget.data.activities.length * 56.0,
-      ),
-      child: Scrollbar(
-        thumbVisibility: true,
-        child: ListView(
-          padding: EdgeInsets.zero,
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final dialogHeight = math.min(screenHeight * .62, 460.0);
+
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      title: Text(widget.operator.name),
+      contentPadding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: dialogHeight,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               '${widget.date.day}/${widget.date.month}/${widget.date.year}',
               style: const TextStyle(color: Colors.black54),
             ),
-            const SizedBox(height: 12),
-            ...widget.data.activities.map(
-              (a) => CheckboxListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-                value: chosen.contains(a.id),
-                activeColor: teal,
-                secondary: CircleAvatar(
-                  radius: 6,
-                  backgroundColor: Color(a.color),
+            const SizedBox(height: 8),
+            const Divider(height: 1),
+            const SizedBox(height: 4),
+            Expanded(
+              child: Scrollbar(
+                thumbVisibility: true,
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(right: 4),
+                  itemCount: widget.data.activities.length,
+                  itemBuilder: (context, index) {
+                    final a = widget.data.activities[index];
+                    return CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      value: chosen.contains(a.id),
+                      activeColor: teal,
+                      secondary: CircleAvatar(
+                        radius: 6,
+                        backgroundColor: Color(a.color),
+                      ),
+                      title: Text(a.name),
+                      onChanged: (v) => setState(
+                        () => v == true
+                            ? chosen.add(a.id)
+                            : chosen.remove(a.id),
+                      ),
+                    );
+                  },
                 ),
-                title: Text(a.name),
-                onChanged: (v) =>
-                    setState(() => v! ? chosen.add(a.id) : chosen.remove(a.id)),
               ),
             ),
           ],
         ),
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Annulla'),
-      ),
-      FilledButton(
-        onPressed: () {
-          widget.onSaved(chosen.toList());
-          Navigator.pop(context);
-        },
-        child: const Text('Salva attività'),
-      ),
-    ],
-  );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annulla'),
+        ),
+        FilledButton(
+          onPressed: () {
+            widget.onSaved(chosen.toList());
+            Navigator.pop(context);
+          },
+          child: const Text('Salva attività'),
+        ),
+      ],
+    );
+  }
 }
 
 class ReportPage extends StatefulWidget {
@@ -877,4 +895,3 @@ class SettingsCard extends StatelessWidget {
     ),
   );
 }
-
