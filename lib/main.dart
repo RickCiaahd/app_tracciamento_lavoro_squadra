@@ -527,7 +527,7 @@ class _ReportPageState extends State<ReportPage> {
                       lastDate: DateTime(2100),
                       initialDate: reference,
                     );
-                    if (d != null) setState(() => reference = d!),
+                    if (d != null) setState(() => reference = d!);
                   },
                   icon: const Icon(Icons.event),
                   label: Text(
