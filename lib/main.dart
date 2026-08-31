@@ -527,7 +527,7 @@ class _ReportPageState extends State<ReportPage> {
                       lastDate: DateTime(2100),
                       initialDate: reference,
                     );
-                    if (d != null) setState(() => reference = d!);
+                    if (d != null) setState(() => reference = d);
                   },
                   icon: const Icon(Icons.event),
                   label: Text(
@@ -726,24 +726,49 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   Future<String?> ask(String title, [String value = '']) async {
-    final c = TextEditingController(text: value);
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: TextField(controller: c, autofocus: true),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annulla'),
+    final controller = TextEditingController(text: value);
+    try {
+      return await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          scrollable: true,
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            decoration: const InputDecoration(
+              hintText: 'Inserisci un nome',
+              border: OutlineInputBorder(),
+            ),
+            onSubmitted: (value) {
+              final trimmed = value.trim();
+              if (trimmed.isNotEmpty) {
+                Navigator.of(dialogContext).pop(trimmed);
+              }
+            },
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, c.text.trim()),
-            child: const Text('Salva'),
-          ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Annulla'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final trimmed = controller.text.trim();
+                if (trimmed.isNotEmpty) {
+                  Navigator.of(dialogContext).pop(trimmed);
+                }
+              },
+              child: const Text('Salva'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> addOperator() async {
@@ -761,22 +786,28 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> addActivity() async {
     final name = await ask('Nuova attività');
-    if (name?.isNotEmpty ?? false) {
-      const colors = [
-        0xFF0F766E,
-        0xFFE76F51,
-        0xFF457B9D,
-        0xFF8E5EA2,
-        0xFFF4A261,
-      ];
-      widget.data.activities.add(
-        ActivityModel(
-          id: 'act-${DateTime.now().microsecondsSinceEpoch}',
-          name: name!,
-          color: colors[widget.data.activities.length % colors.length],
-        ),
+    if (name == null || name.isEmpty) return;
+
+    const colors = [
+      0xFF0F766E,
+      0xFFE76F51,
+      0xFF457B9D,
+      0xFF8E5EA2,
+      0xFFF4A261,
+    ];
+    widget.data.activities.add(
+      ActivityModel(
+        id: 'act-${DateTime.now().microsecondsSinceEpoch}',
+        name: name,
+        color: colors[widget.data.activities.length % colors.length],
+      ),
+    );
+    await widget.onChanged();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Attività "$name" aggiunta')),
       );
-      await widget.onChanged();
     }
   }
 
