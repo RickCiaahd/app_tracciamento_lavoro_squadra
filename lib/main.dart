@@ -373,30 +373,37 @@ class _ActivityDialogState extends State<ActivityDialog> {
   Widget build(BuildContext context) => AlertDialog(
     title: Text(widget.operator.name),
     content: SizedBox(
-      width: 420,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${widget.date.day}/${widget.date.month}/${widget.date.year}',
-            style: const TextStyle(color: Colors.black54),
-          ),
-          const SizedBox(height: 12),
-          ...widget.data.activities.map(
-            (a) => CheckboxListTile(
-              value: chosen.contains(a.id),
-              activeColor: teal,
-              secondary: CircleAvatar(
-                radius: 6,
-                backgroundColor: Color(a.color),
-              ),
-              title: Text(a.name),
-              onChanged: (v) =>
-                  setState(() => v! ? chosen.add(a.id) : chosen.remove(a.id)),
+      width: double.maxFinite,
+      height: math.min(
+        MediaQuery.sizeOf(context).height * .58,
+        72.0 + widget.data.activities.length * 56.0,
+      ),
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Text(
+              '${widget.date.day}/${widget.date.month}/${widget.date.year}',
+              style: const TextStyle(color: Colors.black54),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            ...widget.data.activities.map(
+              (a) => CheckboxListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                value: chosen.contains(a.id),
+                activeColor: teal,
+                secondary: CircleAvatar(
+                  radius: 6,
+                  backgroundColor: Color(a.color),
+                ),
+                title: Text(a.name),
+                onChanged: (v) =>
+                    setState(() => v! ? chosen.add(a.id) : chosen.remove(a.id)),
+              ),
+            ),
+          ],
+        ),
       ),
     ),
     actions: [
